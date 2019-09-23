@@ -16,8 +16,8 @@ class TenJokes extends PureComponent {
   async componentDidMount() {
     for (let i = 0; i < 10; i++) {
       const response = await axios.get("https://icanhazdadjoke.com/", {
-         headers: { Accept: 'application/json' } 
-        });
+        headers: { Accept: 'application/json' }
+      });
       const joke = response.data;
       this.setState(state => ({
         jokes: [...state.jokes, joke]
@@ -26,37 +26,33 @@ class TenJokes extends PureComponent {
   }
 
   upVote(id) {
-    for (let joke of this.state.jokes) {
-      if (joke.id === id) {
-        if (joke.score === undefined) {
-          joke.score = 1
-        } else {
-          joke.score = joke.score + 1
+    this.setState(state => ({
+      jokes: state.jokes.map((joke, jokeID) => {
+        if (id === this.state.jokes[jokeID].id) {
+          if (joke.score === undefined) {
+            joke.score = 1
+          } else {
+            joke.score = joke.score + 1
+          }
         }
-      }
-      let stateCopy = [...this.state.jokes]
-      stateCopy.splice(this.state.jokes.indexOf(joke))
-      this.setState(state => ({
-        jokes: [...stateCopy, joke]
-      }));
-    }
+        return joke
+      })
+    }))
   }
 
   downVote(id) {
-    for (let joke of this.state.jokes) {
-      if (joke.id === id) {
-        if (joke.score === undefined) {
-          joke.score = -1
-        } else {
-          joke.score = joke.score - 1
+    this.setState(state => ({
+      jokes: state.jokes.map((joke, jokeID) => {
+        if (id === this.state.jokes[jokeID].id) {
+          if (joke.score === undefined) {
+            joke.score = -1
+          } else {
+            joke.score = joke.score - 1
+          }
         }
-      }
-      let stateCopy = [...this.state.jokes]
-      stateCopy.splice(this.state.jokes.indexOf(joke))
-      this.setState(state => ({
-        jokes: [...stateCopy, joke]
-      }));
-    }
+        return joke
+      })
+    }))
   }
 
   render() {
