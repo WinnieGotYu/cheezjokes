@@ -1,9 +1,9 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import "./App.css";
-import Joke from "./Jokes";
+import Joke from "./Joke";
 import axios from "axios";
 
-class TenJokes extends Component {
+class TenJokes extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -14,8 +14,10 @@ class TenJokes extends Component {
   }
 
   async componentDidMount() {
-    for (i = 0; i < 10; i++) {
-      const response = await axios.get("https://icanhazdadjoke.com/");
+    for (let i = 0; i < 10; i++) {
+      const response = await axios.get("https://icanhazdadjoke.com/", {
+         headers: { Accept: 'application/json' } 
+        });
       const joke = response.data;
       this.setState(state => ({
         jokes: [...state.jokes, joke]
@@ -23,18 +25,51 @@ class TenJokes extends Component {
     }
   }
 
-  upVote(id) {}
+  upVote(id) {
+    for (let joke of this.state.jokes) {
+      if (joke.id === id) {
+        if (joke.score === undefined) {
+          joke.score = 1
+        } else {
+          joke.score = joke.score + 1
+        }
+      }
+      let stateCopy = [...this.state.jokes]
+      stateCopy.splice(this.state.jokes.indexOf(joke))
+      this.setState(state => ({
+        jokes: [...stateCopy, joke]
+      }));
+    }
+  }
+
+  downVote(id) {
+    for (let joke of this.state.jokes) {
+      if (joke.id === id) {
+        if (joke.score === undefined) {
+          joke.score = -1
+        } else {
+          joke.score = joke.score - 1
+        }
+      }
+      let stateCopy = [...this.state.jokes]
+      stateCopy.splice(this.state.jokes.indexOf(joke))
+      this.setState(state => ({
+        jokes: [...stateCopy, joke]
+      }));
+    }
+  }
 
   render() {
     return (
       <div>
         {this.state.jokes.map(joke => (
-          <Card
+          <Joke
             id={joke.id}
             key={joke.id}
             joke={joke.joke}
             upVote={this.upVote}
             downVote={this.downVote}
+            score={joke.score}
           />
         ))}
       </div>
